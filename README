@@ -37,7 +37,7 @@ Chatserver code example:
 
 use Cladichat qw (server);
 
-$port = shift || die;
+$port = shift || die; #ex 9999 or 8888
 
 $username = shift || die;
 
@@ -55,7 +55,7 @@ use Cladichat qw (client);
 
 $server = shift || die;
 
-$porta = shift || die;
+$porta = shift || die; 
 
 $username = shift || die;
 

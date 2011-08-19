@@ -145,8 +145,8 @@ Cladichat - Simple Perl Chat
 =head1 SYNOPSIS
 
   use Cladichat qw (server client);
-  server (port protocol);
-  client (server port protocol);
+  server (port username);
+  client (server port username);
 
 =head1 DESCRIPTION
 
