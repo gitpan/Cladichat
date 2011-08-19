@@ -1,4 +1,4 @@
-Cladichat version 0.02
+Cladichat version 0.03
 ======================
 
 The README is used to introduce the module and provide instructions on
@@ -31,23 +31,23 @@ USAGE
 
 Server function Usage:
 
-./Chatserver port protocol
+./Chatserver port username
 
 Chatserver code example:
 
 use Cladichat qw (server);
 
-$porta = shift || die;
+$port = shift || die;
 
-$protocol = shift || die;
+$username = shift || die;
 
-server ($porta, $protocol);
+server ($port, $username);
 
 ###############################
 
 Client function Usage:
 
-./Chatclient server port protocol
+./Chatclient server port username
 
 Chatclient code example:
 
@@ -57,15 +57,15 @@ $server = shift || die;
 
 $porta = shift || die;
 
-$protocol = shift || die;
+$username = shift || die;
 
-client($server, $porta, $protocol);
+client($server, $porta, $username);
 
 
 COPYRIGHT AND LICENCE
 
 
-Copyright (C) 2011 by Cladi Di Domenico (cladi.it)
+Copyright (C) 2011 by Cladi Di Domenico
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.1 or,

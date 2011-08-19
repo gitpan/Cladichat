@@ -24,7 +24,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 sub client
 
@@ -32,15 +32,16 @@ sub client
 
     my $macchina_di_arrivo = $_[0];
     my $porta_di_arrivo    = $_[1];
-    my $protocol           = $_[2];
+    my $username           = $_[2];
+
 
     my $tunnel = IO::Socket::INET->new(
-        Proto    => $protocol,
+        Proto    => 'tcp',
         PeerAddr => $macchina_di_arrivo,
         PeerPort => $porta_di_arrivo
       );
 
-print "Connected to $macchina_di_arrivo on port: $porta_di_arrivo, protocol:$protocol...\n Talk!...\n"
+print "Connected to $macchina_di_arrivo on port: $porta_di_arrivo, protocol:tcp...\n Talk!...\n"
 
       or die
       "can't connect to port $porta_di_arrivo on $macchina_di_arrivo: $!";
@@ -74,6 +75,7 @@ print "Connected to $macchina_di_arrivo on port: $porta_di_arrivo, protocol:$pro
 
             # send
             chomp $parolemie;
+            $parolemie = "$username".':'."$parolemie"; 
             print $tunnel "$parolemie\n\r";
 
         }
@@ -86,15 +88,15 @@ sub server
 {
 
     my $mia_porta_in_ascolto = $_[0];
-    my $protocol = $_[1];
+    my $username = $_[1];
     my $tunnel = IO::Socket::INET->new(
-        Proto     => $protocol,
+        Proto     => 'tcp',
         LocalPort => $mia_porta_in_ascolto,
         Listen    => SOMAXCONN,
         Reuse     => 1
     );
 
-print "\nServer online, port: $mia_porta_in_ascolto, protocol: $protocol, wait for connections...\n\t";
+print "\nServer online, port: $mia_porta_in_ascolto, protocol: tcp, wait for connections...\n\t";
     die "Non riesco a creare il tunnel" unless $tunnel;
     while ( my $pc_remoto = $tunnel->accept() ) {
         $pc_remoto->autoflush(1);
@@ -121,6 +123,8 @@ print "\nServer online, port: $mia_porta_in_ascolto, protocol: $protocol, wait f
             while ( defined( my $parolemie = <> ) ) {
 
                 # send
+                chomp $username;
+                $parolemie = "$username".':'."$parolemie"; 
                 print $pc_remoto $parolemie;
             }
         }
