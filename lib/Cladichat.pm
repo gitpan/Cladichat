@@ -32,13 +32,16 @@ sub client
 
     my $macchina_di_arrivo = $_[0];
     my $porta_di_arrivo    = $_[1];
-
+    my $protocol           = $_[2];
 
     my $tunnel = IO::Socket::INET->new(
-        Proto    => "tcp",
+        Proto    => $protocol,
         PeerAddr => $macchina_di_arrivo,
         PeerPort => $porta_di_arrivo
-      )
+      );
+
+print "Connected to $macchina_di_arrivo on port: $porta_di_arrivo, protocol:$protocol...\n Talk!...\n"
+
       or die
       "can't connect to port $porta_di_arrivo on $macchina_di_arrivo: $!";
 
@@ -66,7 +69,7 @@ sub client
     else {
 
         # client talk......
-        print $tunnel "Hi!\n\r";    #  test words 
+        print $tunnel "Client Connected!\n Talk!...\n\r";    #  test  
         while ( defined( my $parolemie = <STDIN> ) ) {
 
             # send
@@ -83,13 +86,15 @@ sub server
 {
 
     my $mia_porta_in_ascolto = $_[0];
-
+    my $protocol = $_[1];
     my $tunnel = IO::Socket::INET->new(
-        Proto     => 'tcp',
+        Proto     => $protocol,
         LocalPort => $mia_porta_in_ascolto,
         Listen    => SOMAXCONN,
         Reuse     => 1
     );
+
+print "\nServer online, port: $mia_porta_in_ascolto, protocol: $protocol, wait for connections...\n\t";
     die "Non riesco a creare il tunnel" unless $tunnel;
     while ( my $pc_remoto = $tunnel->accept() ) {
         $pc_remoto->autoflush(1);
@@ -111,7 +116,7 @@ sub server
 
         # 2nd process
         else {
-
+        
             # server speak
             while ( defined( my $parolemie = <> ) ) {
 
@@ -131,12 +136,13 @@ __END__
 
 =head1 NAME
 
-Cladichat - Perl extension for blah blah blah
+Cladichat - Simple Perl Chat
 
 =head1 SYNOPSIS
 
-  use Cladichat;
-  blah blah blah
+  use Cladichat qw (server client);
+  server (port protocol);
+  client (server port protocol);
 
 =head1 DESCRIPTION
 
@@ -144,13 +150,10 @@ Stub documentation for Cladichat, created by h2xs. It looks like the
 author of the extension was negligent enough to leave the stub
 unedited.
 
-Blah blah blah.
 
 =head2 EXPORT
 
 None by default.
-
-
 
 =head1 SEE ALSO
 
@@ -167,7 +170,7 @@ Cladi.it
 
 =head1 AUTHOR
 
-Cladi, E<lt>kingitalia@gmail.comE<gt>
+Cladi, E<lt>cladi@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

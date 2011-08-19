@@ -1,4 +1,4 @@
-Cladichat version 0.01
+Cladichat version 0.02
 ======================
 
 The README is used to introduce the module and provide instructions on
@@ -31,7 +31,7 @@ USAGE
 
 Server function Usage:
 
-./Chatserver port
+./Chatserver port protocol
 
 Chatserver code example:
 
@@ -39,13 +39,15 @@ use Cladichat qw (server);
 
 $porta = shift || die;
 
-server ($porta);
+$protocol = shift || die;
+
+server ($porta, $protocol);
 
 ###############################
 
 Client function Usage:
 
-./Chat_client server port
+./Chatclient server port protocol
 
 Chatclient code example:
 
@@ -55,7 +57,9 @@ $server = shift || die;
 
 $porta = shift || die;
 
-client($server, $porta);
+$protocol = shift || die;
+
+client($server, $porta, $protocol);
 
 
 COPYRIGHT AND LICENCE
