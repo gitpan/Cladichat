@@ -152,9 +152,20 @@ Cladichat - Simple Perl Chat
 
 =head1 SYNOPSIS
 
-  use Cladichat qw (server client);
-  server (port username);
-  client (server port username);
+
+use Cladichat qw (server);
+
+my %srvref = ( porta  => "9999", username => "Max");
+
+server(\%srvref);
+
+###############################
+
+use Cladichat qw (client);
+
+my %clref = (server => "localhost", porta  => "9999", username => "John");
+
+client(\%clref);
 
 =head1 DESCRIPTION
 
