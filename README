@@ -1,4 +1,4 @@
-Cladichat version 0.03
+Cladichat version 0.04
 ======================
 
 The README is used to introduce the module and provide instructions on
@@ -21,45 +21,36 @@ To install this module type the following:
    make test
    make install
 
+
+
 DEPENDENCIES
 
 This module requires these other modules and libraries:
 
 IO::Socket
 
+
+
 USAGE
 
-Server function Usage:
-
-./Chatserver port username
-
-Chatserver code example:
+Server example:
 
 use Cladichat qw (server);
 
-$port = shift || die; #ex 9999 or 8888
+my %srvref = ( porta  => "9999", username => "Max");
 
-$username = shift || die;
-
-server ($port, $username);
+server(\%srvref);
 
 ###############################
 
-Client function Usage:
-
-./Chatclient server port username
-
-Chatclient code example:
+Client example:
 
 use Cladichat qw (client);
 
-$server = shift || die;
+my %clref = (server => "localhost", porta  => "9999", username => "John");
 
-$porta = shift || die; 
+client(\%clref);
 
-$username = shift || die;
-
-client($server, $porta, $username);
 
 
 COPYRIGHT AND LICENCE

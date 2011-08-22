@@ -24,15 +24,18 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub client
 
 {
+    #use reference for values
 
-    my $macchina_di_arrivo = $_[0];
-    my $porta_di_arrivo    = $_[1];
-    my $username           = $_[2];
+    my $cl = shift;
+
+    my $macchina_di_arrivo = $cl->{server};
+    my $porta_di_arrivo    = $cl->{porta};
+    my $username           = $cl->{username};
 
 
     my $tunnel = IO::Socket::INET->new(
@@ -41,13 +44,14 @@ sub client
         PeerPort => $porta_di_arrivo
       );
 
-print "Connected to $macchina_di_arrivo on port: $porta_di_arrivo, protocol:tcp...\n Talk!...\n"
+print "Connected to $macchina_di_arrivo on port: $porta_di_arrivo, protocol: tcp...\n Talk!...\n"
 
       or die
       "can't connect to port $porta_di_arrivo on $macchina_di_arrivo: $!";
 
     
-    $tunnel->autoflush(1);
+    $tunnel->autoflush(1); 
+
     my $processo = fork();
 
     # 1st process
@@ -60,10 +64,8 @@ print "Connected to $macchina_di_arrivo on port: $porta_di_arrivo, protocol:tcp.
             print STDOUT $paroleserver;
         }
 
-
         kill( "TERM", $processo );
 
-        die;
     }
 
 # 2nd process
@@ -87,16 +89,22 @@ sub server
 
 {
 
-    my $mia_porta_in_ascolto = $_[0];
-    my $username = $_[1];
+    #use reference for values
+
+    my $srv = shift; 
+    
+    my $porta = $srv->{porta}; 
+    
+    my $username = $srv ->{username};
+
     my $tunnel = IO::Socket::INET->new(
         Proto     => 'tcp',
-        LocalPort => $mia_porta_in_ascolto,
+        LocalPort => $porta,
         Listen    => SOMAXCONN,
         Reuse     => 1
     );
 
-print "\nServer online, port: $mia_porta_in_ascolto, protocol: tcp, wait for connections...\n\t";
+print "\nServer online, port: $porta, protocol: tcp, wait for connections...\n\t";
     die "Non riesco a creare il tunnel" unless $tunnel;
     while ( my $pc_remoto = $tunnel->accept() ) {
         $pc_remoto->autoflush(1);
@@ -170,7 +178,6 @@ If you have a mailing list set up for your module, mention it here.
 
 If you have a web site set up for your module, mention it here.
 
-Cladi.it
 
 =head1 AUTHOR
 
