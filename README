@@ -1,16 +1,7 @@
-Cladichat version 0.04
+Cladichat version 0.05
 ======================
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
 
-A README file is required for CPAN modules since CPAN extracts the
-README file from a module distribution so that people browsing the
-archive can use it get an idea of the modules uses. It is usually a
-good idea to provide version information here so that people can
-decide whether fixes for the module are worth downloading.
 
 INSTALLATION
 
@@ -30,26 +21,28 @@ This module requires these other modules and libraries:
 IO::Socket
 
 
-
 USAGE
 
 Server example:
 
 use Cladichat qw (server);
 
-my %srvref = ( porta  => "9999", username => "Max");
+my %srvref = ( porta    => "9998", 
+               username => "Max",
+               logfile  => "logserver.txt" );
 
-server(\%srvref);
+server( \%srvref );
 
 ###############################
 
-Client example:
-
 use Cladichat qw (client);
 
-my %clref = (server => "localhost", porta  => "9999", username => "John");
+my %clref = ( server => "localhost",
+               porta => "9998", 
+            username => "John",
+             logfile => "logclient.txt" );
 
-client(\%clref);
+client( \%clref );
 
 
 

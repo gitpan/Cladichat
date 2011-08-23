@@ -1,5 +1,8 @@
 Revision history for Perl extension Cladichat.
 
+
+0.05  Tue Aug 23 11:22:40 2011 ----Add chat log
+
 0.04  Mon Aug 22 15:28:32 2011 ----Add reference for values
 
 0.03  Fri Aug 19 20:10:20 2011 ----Add username and default protocol

@@ -8,23 +8,13 @@ require Exporter;
 
 our @ISA = qw(Exporter);
 
-# Items to export into callers namespace by default. Note: do not export
-# names by default without a very good reason. Use EXPORT_OK instead.
-# Do not simply export all your public functions/methods/constants.
-
-# This allows declaration	use Cladichat ':all';
-# If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
-# will save memory.
-
 our %EXPORT_TAGS = ( 'all' => [ qw(client server) ] );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
-our @EXPORT = qw(
-	
-);
+our @EXPORT = qw();
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub client
 
@@ -36,6 +26,7 @@ sub client
     my $macchina_di_arrivo = $cl->{server};
     my $porta_di_arrivo    = $cl->{porta};
     my $username           = $cl->{username};
+    my $log                = $cl->{logfile};
 
 
     my $tunnel = IO::Socket::INET->new(
@@ -44,14 +35,13 @@ sub client
         PeerPort => $porta_di_arrivo
       );
 
-print "Connected to $macchina_di_arrivo on port: $porta_di_arrivo, protocol: tcp...\n Talk!...\n"
 
-      or die
-      "can't connect to port $porta_di_arrivo on $macchina_di_arrivo: $!";
+    $tunnel->autoflush(1) or die "can't connect to port $porta_di_arrivo on          $macchina_di_arrivo: $!"; 
+
+    print "Connected to $macchina_di_arrivo on port: $porta_di_arrivo, protocol: tcp...\n Talk!...\n";
 
     
-    $tunnel->autoflush(1); 
-
+   
     my $processo = fork();
 
     # 1st process
@@ -59,9 +49,14 @@ print "Connected to $macchina_di_arrivo on port: $porta_di_arrivo, protocol: tcp
 
         # server Talk.....
         while ( defined( my $paroleserver = <$tunnel> ) ) {
+         
+        chomp $log;
 
+        open( LOGCLIENT, ">>$log" )or die "$!"; 
             # standard output...
             print STDOUT $paroleserver;
+            print LOGCLIENT "$paroleserver\n";
+            close LOGCLIENT;
         }
 
         kill( "TERM", $processo );
@@ -77,9 +72,18 @@ print "Connected to $macchina_di_arrivo on port: $porta_di_arrivo, protocol: tcp
 
             # send
             chomp $parolemie;
-            $parolemie = "$username".':'."$parolemie"; 
-            print $tunnel "$parolemie\n\r";
 
+            open( LOGCLIENT, ">>$log" )or die "$!";
+
+            $parolemie =    "$username".':'."$parolemie";
+ 
+            print $tunnel   "$parolemie\n\r";
+
+            chomp $parolemie;
+
+            print LOGCLIENT "$parolemie\n";
+            close LOGCLIENT;
+            
         }
     }
 
@@ -92,10 +96,10 @@ sub server
     #use reference for values
 
     my $srv = shift; 
-    
     my $porta = $srv->{porta}; 
-    
     my $username = $srv ->{username};
+    my $log = $srv->{logfile};
+
 
     my $tunnel = IO::Socket::INET->new(
         Proto     => 'tcp',
@@ -108,7 +112,8 @@ print "\nServer online, port: $porta, protocol: tcp, wait for connections...\n\t
     die "Non riesco a creare il tunnel" unless $tunnel;
     while ( my $pc_remoto = $tunnel->accept() ) {
         $pc_remoto->autoflush(1);
-
+         
+        
         
         my $processo = fork();
 
@@ -118,9 +123,16 @@ print "\nServer online, port: $porta, protocol: tcp, wait for connections...\n\t
             # client speak
             while ( defined( my $paroleclient = <$pc_remoto> ) ) {
 
+                chomp $log;
+         
+                open( LOGSERVER, ">>$log" )or die "$!";
                 
                 print STDOUT $paroleclient;
+                print LOGSERVER "$paroleclient\n";
+
+                close LOGSERVER;
             }
+
             kill( "TERM", $processo );
         }
 
@@ -133,18 +145,22 @@ print "\nServer online, port: $porta, protocol: tcp, wait for connections...\n\t
                 # send
                 chomp $username;
                 $parolemie = "$username".':'."$parolemie"; 
+                chomp $log;
+                open( LOGSERVER, ">>$log" )or die "$!";
                 print $pc_remoto $parolemie;
+                print LOGSERVER "$parolemie\n";
+                
+                close LOGSERVER;
             }
         }
     }
 }
 
 
-# Preloaded methods go here.
 
 1;
 __END__
-# Below is stub documentation for your module. You'd better edit it!
+
 
 =head1 NAME
 
@@ -155,23 +171,28 @@ Cladichat - Simple Perl Chat
 
 use Cladichat qw (server);
 
-my %srvref = ( porta  => "9999", username => "Max");
+my %srvref = ( porta    => "9998", 
+               username => "Max",
+               logfile  => "logserver.txt" );
 
-server(\%srvref);
+server( \%srvref );
 
 ###############################
 
 use Cladichat qw (client);
 
-my %clref = (server => "localhost", porta  => "9999", username => "John");
+my %clref = ( server => "localhost",
+               porta => "9998", 
+            username => "John",
+             logfile => "logclient.txt" );
 
-client(\%clref);
+client( \%clref );
+
 
 =head1 DESCRIPTION
 
-Stub documentation for Cladichat, created by h2xs. It looks like the
-author of the extension was negligent enough to leave the stub
-unedited.
+
+Simple Server-Client Chat
 
 
 =head2 EXPORT
@@ -179,15 +200,6 @@ unedited.
 None by default.
 
 =head1 SEE ALSO
-
-Mention other useful documentation such as the documentation of
-related modules or operating system documentation (such as man pages
-in UNIX), or any relevant external documentation such as RFCs or
-standards.
-
-If you have a mailing list set up for your module, mention it here.
-
-If you have a web site set up for your module, mention it here.
 
 
 =head1 AUTHOR
